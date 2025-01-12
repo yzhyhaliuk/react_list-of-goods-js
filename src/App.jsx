@@ -16,16 +16,22 @@ export const goodsFromServer = [
   'Garlic',
 ];
 
-function getPreparedGoods(goods, field, reversed) {
+const SORT_FIELD = {
+  None: '',
+  Alphabet: 'alphabet',
+  Length: 'length',
+};
+
+function getPreparedGoods(goods, field, isReversed) {
   const preparedGoods = [...goods];
 
   if (field) {
     preparedGoods.sort((good1, good2) => {
       switch (field) {
-        case 'alphabet':
+        case SORT_FIELD.Alphabet:
           return good1.localeCompare(good2);
 
-        case 'length':
+        case SORT_FIELD.Length:
           return good1.length - good2.length;
 
         default:
@@ -34,7 +40,7 @@ function getPreparedGoods(goods, field, reversed) {
     });
   }
 
-  if (reversed) {
+  if (isReversed) {
     preparedGoods.reverse();
   }
 
@@ -42,43 +48,50 @@ function getPreparedGoods(goods, field, reversed) {
 }
 
 export const App = () => {
-  const [field, setField] = useState('');
-  const [reversed, setReversed] = useState(false);
-  const visibleGoods = getPreparedGoods(goodsFromServer, field, reversed);
+  const [field, setField] = useState(SORT_FIELD.None);
+  const [isReversed, setIsReversed] = useState(false);
+  const visibleGoods = getPreparedGoods(goodsFromServer, field, isReversed);
+  const Reset = () => {
+    setField(SORT_FIELD.None);
+    setIsReversed(false);
+  };
 
   return (
     <div className="section content">
       <div className="buttons">
         <button
-          onClick={() => setField('alphabet')}
+          onClick={() => setField(SORT_FIELD.Alphabet)}
           type="button"
-          className={`button is-info ${classNames({ 'is-light': field !== 'alphabet' })}`}
+          className={classNames('button is-info', {
+            'is-light': field !== SORT_FIELD.Alphabet,
+          })}
         >
           Sort alphabetically
         </button>
 
         <button
-          onClick={() => setField('length')}
+          onClick={() => setField(SORT_FIELD.Length)}
           type="button"
-          className={`button is-success ${classNames({ 'is-light': field !== 'length' })}`}
+          className={classNames('button is-success', {
+            'is-light': field !== SORT_FIELD.Length,
+          })}
         >
           Sort by length
         </button>
 
         <button
-          onClick={() => setReversed(!reversed)}
+          onClick={() => setIsReversed(!isReversed)}
           type="button"
-          className={`button is-warning ${classNames({ 'is-light': reversed === false })}`}
+          className={classNames('button is-warning', {
+            'is-light': isReversed === false,
+          })}
         >
           Reverse
         </button>
 
-        {(field || reversed) && (
+        {(field || isReversed) && (
           <button
-            onClick={() => {
-              setField('');
-              setReversed(false);
-            }}
+            onClick={Reset}
             type="button"
             className="button is-danger is-light"
           >
